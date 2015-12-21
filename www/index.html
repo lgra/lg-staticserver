@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en" class="r-Defaults r-VerticalRhythm">
+	<head>
+		<meta charset="utf-8">
+		<title>Application</title>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<style type="text/css">
+.app_base {
+	color: darkblue;
+}
+label {
+	display: inline-flex;
+	width: 15%;
+}
+#i_url, #i_data {
+	display: inline-flex;
+	width: 80%;
+}
+		</style>
+		</head>
+	    <script>
+
+var model = {
+	method: "GET",
+	url: null,
+	data: null,	
+}
+
+function updateGUI() {
+	var methods = document.getElementById("s_methods")
+	methods.setAttribute("value", model.method)
+	var data = document.getElementById("i_data")
+	if (model.method == "PUT" || model.method == "POST") {
+		data.removeAttribute("disabled")
+		data.value = model.data
+	}
+	else {
+		data.setAttribute("disabled", true)
+		data.value = null
+	}
+	var url = document.getElementById("i_url")
+	url.value = model.url
+	var button = document.getElementById("b_request")
+	if (model.url) {
+		button.onclick = performRequest
+		button.removeAttribute("disabled")
+	}
+	else {
+		button.setAttribute("disabled", true)
+	}
+}
+function initGUI() {
+	var methods = document.getElementById("s_methods")
+	methods.onchange = function () {
+		model.method = this.value
+		updateGUI()
+	}
+	var data = document.getElementById("i_data")
+	data.onchange = function () {
+		model.data = this.value
+		updateGUI()
+	}
+	var url = document.getElementById("i_url")
+	url.onchange = function () {
+		model.url = this.value
+		updateGUI()
+	}
+}
+
+function performRequest() {
+	var request = new XMLHttpRequest()
+	request.open(model.method, model.url, true)
+	request.onload = function() {
+		var pre = document.getElementById("p_result")
+		if (request.status >= 200 && request.status < 400) {
+			try {
+				var obj = JSON.parse(request.responseText)
+				pre.innerText = JSON.stringify(obj, null, 2)
+			}
+			catch (e) {
+				pre.innerText = request.responseText
+			}
+		}
+		else {
+			pre.innerText = "error: " + request.responseText
+		}
+	}
+	request.onerror = function() {
+		var pre = document.getElementById("p_result")
+		pre.innerText = "An error occured: " + request.statusText
+	}
+	request.send((model.method == "PUT" || model.method == "POST")? model.data : null)
+}
+
+window.onload = function () {
+	initGUI()
+	updateGUI()
+}
+
+	    </script>
+	<body>
+		<div>
+			<label for="s_methods">HTTP method: </label>
+			<select id="s_methods">
+				<option value="GET">Get</option>
+				<option value="POST">Post</option>
+				<option value="PUT">Put</option>
+				<option value="DELETE">Del</option>
+			</select>
+		</div>
+		<div>
+			<label for="i_url">URL: </label>
+			<input type="text" id="i_url" placeholder="your url here" />
+		</div>
+		<div>
+			<label for="i_data">data: </label>
+			<textarea id="i_data" placeholder="your post or put data here"></textarea>
+		</div>
+		<div>
+			<button type="submit" id="b_request">Request</button>
+		</div>
+		<div>
+			<pre id="p_result"></pre>
+		</div>
+	</body>
+</html>

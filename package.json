@@ -1,0 +1,17 @@
+{
+  "author": "LG3i",
+  "name": "lg-staticserver",
+  "description": "Small http static server using node.js",
+  "version": "0.0.1",
+  "scripts": {
+    "start": "node static.js"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+  },
+  "optionalDependencies": {},
+  "engines": {
+    "node": "*"
+  }
+}
